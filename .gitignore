@@ -1,0 +1,4 @@
+/src/vendor
+.idea
+/web/node_modules
+/upload/
