@@ -49,12 +49,12 @@ export default {
         for (let i = 0; i < filesCount; i++) {
           this.selectedFiles.push(fileInput[i]);
         }
-        this.$store.commit('CHANGE_ROOT_ELEMENT', {name: 'uploadFormReadyForSubmit', value: true})
+        this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {name: 'uploadFormReadyForSubmit', value: true})
       }
     }
   },
   mounted() {
-    this.$store.commit('CHANGE_ROOT_ELEMENT', {name: 'uploadFormReadyForSubmit', value: false})
+    this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {name: 'uploadFormReadyForSubmit', value: false})
   },
   computed: {
     form() {

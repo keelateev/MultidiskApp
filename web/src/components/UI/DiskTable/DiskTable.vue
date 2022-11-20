@@ -18,7 +18,7 @@
     </thead>
     <tbody>
     <DiskTableBlock
-        v-for="element in $store.state.diskElements"
+        v-for="element in $store.state.diskStore.diskElements"
         :key="element.id"
         :table-element="element"
     />

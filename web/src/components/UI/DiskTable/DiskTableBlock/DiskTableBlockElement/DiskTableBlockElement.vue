@@ -30,10 +30,6 @@ export default {
       type: Object,
       default: ''
     },
-    fileType: {
-      type: String,
-      default: ''
-    }
   },
   methods: {
     deleteFile() {
@@ -51,8 +47,8 @@ export default {
       }
     },
     goToDir(ev) {
-      this.$store.commit('CHANGE_ROOT_ELEMENT', {name: 'paginationCurrent', value: 1})
-      this.$store.dispatch('GET_RESOURCE', {'path': ev.target.getAttribute('data-path')})
+      this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {name: 'paginationCurrent', value: 1})
+      this.$store.dispatch('GET_RESOURCE',  {path: ev.target.getAttribute('data-path')})
     },
   },
   computed: {

@@ -4,7 +4,8 @@
         "arhitector/yandex": "^2.2",
         "pecee/simple-router": "4.3.7.2",
         "ext-json": "*",
-      "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "myclabs/php-enum": "^1.8"
     },
     "config": {
         "platform": {
