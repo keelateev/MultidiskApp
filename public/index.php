@@ -1,6 +1,7 @@
 <?php
 
 use Pecee\SimpleRouter\SimpleRouter as Router;
+use App\Controllers\Application\Service;
 
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);

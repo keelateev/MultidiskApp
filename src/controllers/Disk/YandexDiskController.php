@@ -43,16 +43,16 @@ class YandexDiskController extends AbstractController implements DiskInterface
         $currentPath = $handler->value('currentPath');
         $currentPath = ($currentPath) ? $currentPath . '/' : 'disk:/';
 
-        if (!$_FILES['files']) {
+        $files = $handler->file('files');
+        if (!$files) {
             throw new YandexDiskException('Ошибка при получении файла на сервере');
         }
 
-        foreach ($_FILES['files']['name'] as $key => $fileName) {
-            $newFile = basename($fileName);
+        foreach ($files as $file) {
+            $newFile = basename($file->getFilename());
             $collection = $this->disk->getResource($currentPath . $newFile);
-            $collection->upload($_FILES['files']['tmp_name'][$key], true);
+            $collection->upload($file->getTmpName(), true);
         }
-
 
         return [
             'status' => 'success',
