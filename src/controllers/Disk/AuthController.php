@@ -4,7 +4,6 @@ namespace App\Controllers\Disk;
 
 use App\Controllers\AbstractController;
 use App\Controllers\Application\Service;
-use App\Controllers\Disk\Enum\DiskProviderEnum;
 use App\exceptions\AuthControllerException;
 
 class AuthController extends AbstractController

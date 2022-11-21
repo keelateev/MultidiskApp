@@ -11,9 +11,7 @@ interface DiskInterface
 
     public function rename(InputHandler $handler): array;
 
-    public function download(InputHandler $handler): string;
-
-    public function getDownloadedFile(string $localResource): void;
+    public function download(DiskController $controller, InputHandler $handler): string;
 
     public function upload(InputHandler $handler): array;
 

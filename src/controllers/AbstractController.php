@@ -34,9 +34,7 @@ abstract class AbstractController
 
     public function setDownloadHeader($file)
     {
-        ob_end_clean();
         $this->response->header('Content-Description: File Transfer');
-        $this->response->header('Content-Type: application/octet-stream');
         $this->response->header('Content-Transfer-Encoding: binary');
         $this->response->header('Content-Type: ' . mime_content_type($file));
         $this->response->header('Content-Disposition: attachment; filename=' . basename($file));
