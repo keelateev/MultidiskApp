@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Disk;
 
+use App\Controllers\AbstractController;
+use App\Controllers\Application\Service;
 use App\Exceptions\YandexDiskException;
 use Arhitector\Yandex\Disk;
 
-class YandexDiskController extends AbstractController
+class YandexDiskController extends AbstractController implements DiskInterface
 {
-    private string $token;
     private Disk $disk;
     private const PAGINATION_LIMIT = 20;
 
-    public function __construct()
+    public function __construct($token)
     {
         parent::__construct();
-        $this->token = $_SESSION['login']['token'];
-        $this->disk = new Disk($this->token);
+        $this->disk = new Disk($token);
     }
 
     private function prepareResponse($collection): array
@@ -38,72 +38,72 @@ class YandexDiskController extends AbstractController
     /**
      * @throws YandexDiskException
      */
-    public function uploadFile()
+    public function upload($handler): array
     {
-        $currentPath = ($_POST['currentPath']) ? $_POST['currentPath'] . '/' : 'disk:/';
-        if (!$_FILES['files']) {
+        $currentPath = $handler->value('currentPath');
+        $currentPath = ($currentPath) ? $currentPath . '/' : 'disk:/';
+
+        $files = $handler->file('files');
+        if (!$files) {
             throw new YandexDiskException('Ошибка при получении файла на сервере');
         }
-        foreach ($_FILES['files']['name'] as $key => $fileName) {
-            $newFile = basename($fileName);
+
+        foreach ($files as $file) {
+            $newFile = basename($file->getFilename());
             $collection = $this->disk->getResource($currentPath . $newFile);
-            $collection->upload($_FILES['files']['tmp_name'][$key], true);
+            $collection->upload($file->getTmpName(), true);
         }
 
-
-        return $this->response->json([
+        return [
             'status' => 'success',
-        ]);
+        ];
     }
 
-    public function getDiskInfo()
+    public function info($handler): array
     {
-        return $this->response->json([
+        return [
             'status' => 'success',
             'result' => [
                 'user_name' => $this->disk->toArray()['user']['display_name'],
                 'total_space' => $this->disk->toArray()['free_space'],
                 'free_space' => $this->disk->toArray()['total_space'],
             ]
-        ]);
+        ];
     }
 
     /**
      * @throws YandexDiskException
      */
-    public function deleteFile()
+    public function delete($handler): array
     {
-        if (empty($_POST) || empty($_POST['resource'])) {
+        $resourcePath = $handler->value('resource');
+        if (!$resourcePath) {
             throw new YandexDiskException('Ошибка в указании ресурса');
         }
-        $resourcePath = $_POST['resource'];
 
         $resource = $this->disk->getResource('disk:/' . $resourcePath);
         $resource->delete();
 
-        return $this->response->json([
+        return [
             'status' => 'success',
-        ]);
+        ];
     }
 
     /**
      * @throws YandexDiskException
      */
-    public function downloadFile()
+    public function download(DiskController $controller, $handler): string
     {
-        if (empty($_POST) || empty($_POST['resource'])) {
-            throw new YandexDiskException('Ошибка в указании ресурса');
-        }
-        $resourcePath = $_POST['resource'];
-        $resourceName = basename($resourcePath);
-        $localResource = $_SERVER['DOCUMENT_ROOT'] . '/../upload/' . $resourceName;
+        $resourceDiskPath = $handler->value('path');
+        $resourceType = $handler->value('type');
+        $resourcePath = ($resourceType == 'dir') ? $resourceDiskPath . '.zip' : $resourceDiskPath;
 
-        $resource = $this->disk->getResource('disk:/' . $resourcePath);
-
+        $localResource = $_SERVER['DOCUMENT_ROOT'] . '/../upload/' . basename($resourcePath);
+        $resource = $this->disk->getResource('disk:/' . $resourceDiskPath);
         $resource->download($localResource, true);
-        ob_end_clean();
 
-        $this->setDownloadHeader($localResource);
+        ob_end_clean();
+        $controller->setDownloadHeader($localResource);
         readfile($localResource);
         unlink($localResource);
         exit();
@@ -112,25 +112,32 @@ class YandexDiskController extends AbstractController
     /**
      * @throws YandexDiskException
      */
-    public function renameFile() {
-        if (empty($_POST) || empty($_POST['resource']) || empty($_POST['newResourceName'])) {
-            throw new YandexDiskException('Ошибка в указании ресурса или нового имени');
+    public function rename($handler): array
+    {
+        $resourcePath = $handler->value('resource');
+        if (!$resourcePath) {
+            throw new YandexDiskException('Ошибка в указании ресурса');
         }
-        $resourcePath = $_POST['resource'];
-        $newResource = explode('/',$resourcePath);
-        $newResource[count($newResource) - 1] = $_POST['newResourceName'];
-        $newResource = implode('/', $newResource);
+
         $resource = $this->disk->getResource('disk:/' . $resourcePath);
+
+        $newResource = explode('/', $resourcePath);
+        $newResource[count($newResource) - 1] = $handler->value('newResourceName');
+        $newResource = implode('/', $newResource);
+
         $resource->move($newResource);
 
-        return $this->response->json([
+        return [
             'status' => 'success',
-        ]);
+        ];
     }
 
-    public function getResource($path = '')
+    public function resource($handler): array
     {
-        $paginationPage = $_POST['page'];
+        $path = $handler->value('diskPath');
+        $path = ($path !== '/') ? $path : '';
+        $paginationPage = $handler->value('paginationPage');
+
         $offset = self::PAGINATION_LIMIT * ($paginationPage - 1);
         $previousPath = '';
         if ($path) {
@@ -139,7 +146,9 @@ class YandexDiskController extends AbstractController
             $previousPath = (implode('/', $previousPath)) ?: '/';
         }
         $currentPath = urldecode($path);
-        $data = $this->prepareResponse($this->disk->getResource('disk:/' . $currentPath,self::PAGINATION_LIMIT, $offset ));
+        $data = $this->prepareResponse(
+            $this->disk->getResource('disk:/' . $currentPath, self::PAGINATION_LIMIT, $offset)
+        );
 
         if ($previousPath) {
             $data = array_merge([
@@ -152,12 +161,13 @@ class YandexDiskController extends AbstractController
                 ]
             ], $data);
         }
-        return $this->response->json([
+
+        return [
             'status' => 'success',
             'currentPath' => $currentPath,
             'pagination' => $this->paginationInfo($currentPath, $offset, $paginationPage),
             'result' => $data
-        ]);
+        ];
     }
 
     public function paginationInfo($currentPath, $offset, $paginationPage): array

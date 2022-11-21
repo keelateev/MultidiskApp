@@ -1,6 +1,6 @@
 <template>
-  <AuthPage v-if="!$store.state.diskAuthentication.disk"/>
-  <MainPage v-if="$store.state.diskAuthentication.disk"/>
+  <AuthPage v-if="!$store.state.userStore.authentication"/>
+  <MainPage v-if="$store.state.userStore.authentication"/>
 </template>
 
 <script>

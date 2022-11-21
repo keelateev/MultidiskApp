@@ -1,11 +1,11 @@
 <template>
   <div class="header-disk-info">
     <div>
-      <p class="header-disk-info__user-name">{{ this.$store.state.diskInfo.user_name }}</p>
+      <p class="header-disk-info__user-name">{{ this.$store.state.diskStore.diskInfo.user_name }}</p>
       <p class="header-disk-info__space header-disk-info__space--total">Свободно:
-        {{ this.formatBytes(this.$store.state.diskInfo.total_space) }}</p>
+        {{ this.formatBytes(this.$store.state.diskStore.diskInfo.total_space) }}</p>
       <p class="header-disk-info__space header-disk-info__space--total">Общий объём:
-        {{ this.formatBytes(this.$store.state.diskInfo.free_space) }}</p>
+        {{ this.formatBytes(this.$store.state.diskStore.diskInfo.free_space) }}</p>
     </div>
     <div>
       <GeneralButton :class="'header-disk-info__upload-btn'" @click="showUploadForm"
@@ -32,10 +32,10 @@ export default {
   },
   methods: {
     showUploadForm() {
-      this.$store.commit('CHANGE_ROOT_ELEMENT', {name: 'isShowUploadForm', value: true})
+      this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {name: 'isShowUploadForm', value: true})
     },
     unLogin() {
-      this.$store.dispatch('UNLOGIN')
+      this.$store.userStore.dispatch('UNLOGIN')
     }
   }
 }

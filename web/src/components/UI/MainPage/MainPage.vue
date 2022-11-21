@@ -1,5 +1,5 @@
 <template>
-  <DiskForm v-if="$store.state.isShowUploadForm" :form-id="'main-upload-form'"/>
+  <DiskForm v-if="$store.state.diskStore.isShowUploadForm" :form-id="'main-upload-form'"/>
   <HeaderBlock></HeaderBlock>
   <DiskTable></DiskTable>
   <Loader v-if="$store.state.isShowLoader"/>
@@ -21,7 +21,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch('GET_DISK_INFO')
-    this.$store.dispatch('GET_RESOURCE', {'path': ''})
+    this.$store.dispatch('GET_RESOURCE', {path: ''})
   },
 }
 </script>

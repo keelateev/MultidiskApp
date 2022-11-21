@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <HeaderDiskInfo v-if="Object.entries(this.$store.state.diskInfo).length !== 0"/>
+    <HeaderDiskInfo v-if="Object.entries(this.$store.state.diskStore.diskInfo).length !== 0"/>
   </header>
 </template>
 

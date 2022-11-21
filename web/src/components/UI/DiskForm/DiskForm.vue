@@ -5,7 +5,7 @@
           :form-id="formId"
       />
       <GeneralButton @click="submitFile" :class="'disk-form__upload-btn'"
-                     :disabled="!($store.state.uploadFormReadyForSubmit && $store.state.uploadFormSubmitted)"
+                     :disabled="!($store.state.diskStore.uploadFormReadyForSubmit && $store.state.diskStore.uploadFormSubmitted)"
                      :button="{
         text: uploadBtnText,
         type: 'button',
@@ -40,13 +40,13 @@ export default {
     closeModal(e) {
       const withinBoundaries = e.composedPath().includes(this.form);
       if (!withinBoundaries) {
-        this.$store.commit('CHANGE_ROOT_ELEMENT', {name: 'isShowUploadForm', value: false})
+        this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {name: 'isShowUploadForm', value: false})
       }
     },
     submitFile() {
       let fileInput = this.form.querySelector('[name=upload-file]');
       if (typeof fileInput.files[0] !== 'undefined') {
-        this.$store.commit('CHANGE_ROOT_ELEMENT', {name: 'uploadFormSubmitted', value: false})
+        this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {name: 'uploadFormSubmitted', value: false})
         this.$store.dispatch('UPLOAD_FILE', fileInput.files);
       }
     },
@@ -59,13 +59,13 @@ export default {
       return document.getElementById(this.formId)
     },
     uploadBtnText() {
-      if (this.$store.state.uploadFormReadyForSubmit && this.$store.state.uploadFormSubmitted) {
+      if (this.$store.state.diskStore.uploadFormReadyForSubmit && this.$store.state.diskStore.uploadFormSubmitted) {
         return 'Загрузить';
       }
-      if (this.$store.state.uploadFormSubmitted) {
+      if (this.$store.state.diskStore.uploadFormSubmitted) {
         return 'Выберите файл';
       }
-      if (!this.$store.state.uploadFormSubmitted) {
+      if (!this.$store.state.diskStore.uploadFormSubmitted) {
         return 'Загрузка...';
       }
     }

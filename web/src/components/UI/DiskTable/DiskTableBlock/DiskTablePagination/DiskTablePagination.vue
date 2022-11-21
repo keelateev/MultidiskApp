@@ -3,15 +3,15 @@
     <td colspan="4" class="disk-table__pagination">
       <div  class="disk-table__pagination__controls">
         <GeneralButton class="disk-table__pagination__button" @click="previewPage" :button="{text: '<'}"
-                       :disabled="$store.state.paginationCurrent === 1"/>
+                       :disabled="$store.state.diskStore.paginationCurrent === 1"/>
         <div class="disk-table__pagination__page" v-for="page in pages"
              :class="{
-        'disk-table__pagination__page--current': page === $store.state.paginationCurrent
+        'disk-table__pagination__page--current': page === $store.state.diskStore.paginationCurrent
       }"
         ><span>{{ page }}</span>
         </div>
         <GeneralButton class="disk-table__pagination__button" @click="nextPage" :button="{text: '>'}"
-                       :disabled="$store.state.paginationAllow === 0"/>
+                       :disabled="$store.state.diskStore.paginationAllow === 0"/>
       </div>
     </td>
   </tr>
@@ -27,32 +27,32 @@ export default {
   },
   methods: {
     previewPage() {
-      this.$store.commit('CHANGE_ROOT_ELEMENT', {
+      this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {
         name: 'paginationCurrent',
-        value: this.$store.state.paginationCurrent - 1
+        value: this.$store.state.diskStore.paginationCurrent - 1
       })
-      this.$store.commit('CHANGE_ROOT_ELEMENT', {
+      this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {
         name: 'paginationAllow',
-        value: this.$store.state.paginationAllow + 1
+        value: this.$store.state.diskStore.paginationAllow + 1
       })
-      this.$store.dispatch('GET_RESOURCE', {path: this.$store.state.currentPath})
+      this.$store.dispatch('GET_RESOURCE',  {path: this.$store.state.diskStore.currentPath})
     },
     nextPage() {
-      this.$store.commit('CHANGE_ROOT_ELEMENT', {
+      this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {
         name: 'paginationCurrent',
-        value: this.$store.state.paginationCurrent + 1
+        value: this.$store.state.diskStore.paginationCurrent + 1
       })
-      this.$store.commit('CHANGE_ROOT_ELEMENT', {
+      this.$store.commit('CHANGE_DISK_STORE_ELEMENT', {
         name: 'paginationAllow',
-        value: this.$store.state.paginationAllow - 1
+        value: this.$store.state.diskStore.paginationAllow - 1
       })
-      this.$store.dispatch('GET_RESOURCE', {path: this.$store.state.currentPath})
+      this.$store.dispatch('GET_RESOURCE', {path: this.$store.state.diskStore.currentPath})
     }
   },
   computed: {
     pages() {
-      let current = this.$store.state.paginationCurrent;
-      let allow = this.$store.state.paginationAllow;
+      let current = this.$store.state.diskStore.paginationCurrent;
+      let allow = this.$store.state.diskStore.paginationAllow;
       let pages = [];
       switch (current) {
         case 1:
