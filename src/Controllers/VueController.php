@@ -8,6 +8,6 @@ class VueController extends AbstractController
 {
     public function run()
     {
-        return $this->renderTemplate(Service::getDocumentRoot() . '/../src/views/vue/vue_page.php');
+        return $this->renderTemplate(Service::getDocumentRoot() . '/../src/views/vue_template.php');
     }
 }
