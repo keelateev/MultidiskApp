@@ -21,16 +21,15 @@ class DiskController extends AbstractController
     public function diskAction($action)
     {
         try {
-            $disk = Service::getSession()['login']['disk'];
+            $disk = strtoupper(Service::getSession()['login']['disk']);
             $controllerClass = DiskProviderEnum::$disk()->getValue();
             $controller = new $controllerClass(Service::getSession()['login']['token']);
 
             try {
                 $handler = $this->request->getInputHandler();
+
                 if ($action === 'download') {
-                    $localResource = $controller->$action($handler);
-                    $this->setDownloadHeader($localResource);
-                    $controller->getDownloadFile($localResource);
+                    $controller->$action($this, $handler);
                 } else {
                     $this->response->json($controller->$action($handler));
                 }

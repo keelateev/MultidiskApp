@@ -116,20 +116,20 @@ export const diskActions = {
       console.log(error)
     }
   },
-  async DOWNLOAD_FILE(store, resource) {
+  async DOWNLOAD_FILE(store, params) {
     store.commit('CHANGE_ROOT_ELEMENT', {name: 'isShowLoader', value: true})
     try {
       let formData = new FormData();
-      formData.append('resource', resource)
+      formData.append('path', params.path)
+      formData.append('type', params.type)
       const response = await fetch('/api/v1/disk/download/', {
         method: 'POST',
         body: formData
       })
       if (response.ok) {
         response.blob().then(blob => {
-          console.log(blob)
-          let fileName = resource.split('/').pop();
-          if (fileName.indexOf('.') === -1 && blob.type === 'application/zip') {
+          let fileName = params.path.split('/').pop();
+          if (params.type === 'dir') {
             fileName += '.zip'
           }
           let url = window.URL.createObjectURL(blob);

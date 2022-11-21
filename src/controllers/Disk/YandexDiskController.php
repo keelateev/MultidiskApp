@@ -2,17 +2,19 @@
 
 namespace App\Controllers\Disk;
 
+use App\Controllers\AbstractController;
 use App\Controllers\Application\Service;
 use App\Exceptions\YandexDiskException;
 use Arhitector\Yandex\Disk;
 
-class YandexDiskController implements DiskInterface
+class YandexDiskController extends AbstractController implements DiskInterface
 {
     private Disk $disk;
     private const PAGINATION_LIMIT = 20;
 
     public function __construct($token)
     {
+        parent::__construct();
         $this->disk = new Disk($token);
     }
 
@@ -90,28 +92,18 @@ class YandexDiskController implements DiskInterface
     /**
      * @throws YandexDiskException
      */
-    public function download($handler): string
+    public function download(DiskController $controller, $handler): string
     {
-        $resourcePath = $handler->value('resource');
+        $resourceDiskPath = $handler->value('path');
+        $resourceType = $handler->value('type');
+        $resourcePath = ($resourceType == 'dir') ? $resourceDiskPath . '.zip' : $resourceDiskPath;
 
-        $uploadDir = Service::getDocumentRoot() . '/../upload/';
-        if(!is_dir($uploadDir)) {
-            mkdir($uploadDir);
-        }
-        if (!$resourcePath) {
-            throw new YandexDiskException('Ошибка в указании ресурса');
-        }
-
-        $resourceName = basename($resourcePath);
-        $localResource = $uploadDir . $resourceName;
-        $resource = $this->disk->getResource('disk:/' . $resourcePath);
+        $localResource = $_SERVER['DOCUMENT_ROOT'] . '/../upload/' . basename($resourcePath);
+        $resource = $this->disk->getResource('disk:/' . $resourceDiskPath);
         $resource->download($localResource, true);
 
-        return $localResource;
-    }
-
-    public function getDownloadedFile($localResource): void
-    {
+        ob_end_clean();
+        $controller->setDownloadHeader($localResource);
         readfile($localResource);
         unlink($localResource);
         exit();
@@ -127,10 +119,12 @@ class YandexDiskController implements DiskInterface
             throw new YandexDiskException('Ошибка в указании ресурса');
         }
 
-        $newResource = explode('/', $resourcePath);
-        $newResource[count($newResource) - 1] = $_POST['newResourceName'];
-        $newResource = implode('/', $newResource);
         $resource = $this->disk->getResource('disk:/' . $resourcePath);
+
+        $newResource = explode('/', $resourcePath);
+        $newResource[count($newResource) - 1] = $handler->value('newResourceName');
+        $newResource = implode('/', $newResource);
+
         $resource->move($newResource);
 
         return [
@@ -167,6 +161,7 @@ class YandexDiskController implements DiskInterface
                 ]
             ], $data);
         }
+
         return [
             'status' => 'success',
             'currentPath' => $currentPath,

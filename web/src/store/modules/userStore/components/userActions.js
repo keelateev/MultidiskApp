@@ -10,7 +10,7 @@ export const userActions = {
             alert(resp.message);
             return;
           }
-          store.commit('CHANGE_LOGIN_STATUS', {authentication: true, disk: params.disk})
+          store.commit('CHANGE_USER_STORE_ELEMENT', {name: 'authentication', value: true})
           window.location.search = window.location.hash = ''
         })
       } else {
@@ -31,7 +31,7 @@ export const userActions = {
             alert(resp.message);
             return;
           }
-          store.commit('CHANGE_LOGIN_STATUS', {authentication: false, disk: ''})
+          store.commit('CHANGE_USER_STORE_ELEMENT', {name: 'authentication', value: false})
         })
       } else {
         response.json().then(resp => alert(resp.message))
@@ -48,7 +48,7 @@ export const userActions = {
       if (response.ok) {
         response.json().then(resp => {
           if (resp.status === 'success') {
-            store.commit('CHANGE_LOGIN_STATUS', {authentication: true, disk: resp.disk})
+            store.commit('CHANGE_USER_STORE_ELEMENT', {name: 'authentication', value: true})
           }
         })
       } else {

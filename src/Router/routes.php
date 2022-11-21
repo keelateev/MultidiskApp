@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\VueController;
 use App\Controllers\Disk\{AuthController, DiskController};
 use App\Exceptions\{NotAuthorizedHttpException, YandexDiskException};
 use App\Middlewares\{ProccessRawBody};
@@ -7,9 +8,7 @@ use Pecee\{Http\Request, SimpleRouter\SimpleRouter as Router};
 
 session_start();
 
-Router::setDefaultNamespace('App\Controllers');
-
-Router::get('/', 'VueController@run');
+Router::get('/', [VueController::class, 'run']);
 
 Router::group([
     'prefix' => 'api/v1',
@@ -22,9 +21,6 @@ Router::group([
     Router::get('/auth/login/', [AuthController::class, 'login']);
     Router::post('/disk/{action}/', [DiskController::class, 'diskAction']);
 });
-
-Router::get('/controller', 'VueController@run')
-    ->setMatch('/\/([\w]+)/');
 
 Router::error(function (Request $request, Exception $exception) {
     $response = Router::response();
